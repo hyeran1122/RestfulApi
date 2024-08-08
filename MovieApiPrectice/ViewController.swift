@@ -7,6 +7,20 @@
 
 import UIKit
 
+struct MovieData : Codable {
+    let boxOfficeResult : BoxOfficeResult
+}
+
+struct BoxOfficeResult : Codable {
+    let dailyBoxOfficeList : [DailyBoxOfficeList]
+}
+
+struct DailyBoxOfficeList : Codable {
+    let movieNm : String
+    let audiCnt : String
+}
+
+
 class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     @IBOutlet weak var table: UITableView!
