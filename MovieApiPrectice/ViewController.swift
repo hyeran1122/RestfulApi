@@ -20,8 +20,8 @@ struct DailyBoxOfficeList : Codable {
     let audiCnt : String
 }
 
-
 class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+    var movieData : MovieData?
     
     @IBOutlet weak var table: UITableView!
     
@@ -32,6 +32,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         table.delegate = self
         table.dataSource = self
         getData()
+        
     }
     
     func getData(){
@@ -43,31 +44,44 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                     print(error!)
                     return
                 }
-                if let JSONdata =  data {
-                    let dataString = String(data: JSONdata, encoding: .utf8)
-                    print(dataString!)
+                if let JSONdata = data {
+                    //let dataString = String(data: JSONdata, encoding: .utf8)
+                    //print(dataString!)
+                    
+                    let decoder = JSONDecoder()
+                    do {
+                        let decodedrData =  try decoder.decode(MovieData.self, from: JSONdata)
+//                        print(decodedrData.boxOfficeResult.dailyBoxOfficeList[0].movieNm)
+//                        print(decodedrData.boxOfficeResult.dailyBoxOfficeList[0].audiCnt)
+                        self.movieData = decodedrData
+                        DispatchQueue.main.async{
+                            self.table.reloadData()
+                        }
+                    } catch {
+                        print(error)
+                    }
                 }
             }
             task.resume() //테스크에 할당 된 데이터를 리줌으로 실행, 테스크가 실행된다는건 데이터가 할당된거고, 할당 된 데이터를 가져오는건 리줌!
         }
     }
-
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 5
+        return 10
     }
-
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "myCell", for: indexPath) as! MyTableViewCell
-        cell.movieName.text = indexPath.description
+        cell.movieName.text = movieData?.boxOfficeResult.dailyBoxOfficeList[indexPath.row].movieNm
         return cell
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
+        return 1
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print(indexPath.description)
     }
-
 }
+
